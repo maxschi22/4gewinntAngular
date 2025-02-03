@@ -8,7 +8,7 @@ export class SpiellogikService {
   currentPlayer: string = 'Rot'; // Startspieler
 
   // Methode, um den Spielstatus zu aktualisieren, wenn auf das Spielfeld geklickt wird
-  handleClick(columnIndex: number): void {
+  handleClick(columnIndex: number) {
     for (let row = 5; row >= 0; row--) {
       if (!this.gameBoard[row][columnIndex]) {
         this.gameBoard[row][columnIndex] = this.currentPlayer; // Setze den aktuellen Spieler
@@ -21,7 +21,7 @@ export class SpiellogikService {
   }
 
   // Methode, um die Klasse für jede Zelle zu setzen (z. B. 'red' oder 'yellow')
-  getCellClass(rowIndex: number, columnIndex: number): string {
+  getCellClass(rowIndex: number, columnIndex: number) {
     const cell = this.gameBoard[rowIndex][columnIndex];
     return cell === 'Rot' ? 'red' : cell === 'Gelb' ? 'yellow' : '';
   }
