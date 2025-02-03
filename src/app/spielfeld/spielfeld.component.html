@@ -1,0 +1,32 @@
+<body>
+  <div class="game-container">
+    <h1>4 Gewinnt</h1>
+
+    <!-- Spielfeld -->
+    <div class="board">
+      @for (column of columns; track $index; let columnIndex = $index) {
+      <div class="column">
+        @for (row of rows; track $index; let rowIndex = $index) {
+        <div
+          class="cell"
+          [ngClass]="getCellClass(rowIndex, columnIndex)"
+          (click)="handleClick(columnIndex)"
+        ></div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Spieler-Infos -->
+    <div class="players">
+      <div class="player player-1">
+        <div class="player-token"></div>
+        <span class="player-name">Spieler 1</span>
+      </div>
+      <div class="player player-2">
+        <span class="player-name">Spieler 2</span>
+        <div class="player-token"></div>
+      </div>
+    </div>
+  </div>
+</body>
