@@ -4,8 +4,23 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class SpiellogikService {
-  gameBoard: string[][] = Array.from({ length: 6 }, () => Array(7).fill(''));
   currentPlayer: string = 'Rot'; // Startspieler
+  gameBoard: string[][]; // Deklaration des Spielbretts
+
+  constructor() {
+    // Erstelle ein leeres Spielbrett mit 6 Zeilen und 7 Spalten
+    const rows = 6;
+    const cols = 7;
+    this.gameBoard = []; // Initialisiere das Spielbrett als leeres Array
+
+    for (let r = 0; r < rows; r++) {
+      const row = []; // Erstelle eine neue Zeile
+      for (let c = 0; c < cols; c++) {
+        row.push(''); // Füge einen leeren String zur Zeile hinzu
+      }
+      this.gameBoard.push(row); // Füge die Zeile zum Spielbrett hinzu
+    }
+  }
 
   // Methode, um den Spielstatus zu aktualisieren, wenn auf das Spielfeld geklickt wird
   handleClick(columnIndex: number) {
