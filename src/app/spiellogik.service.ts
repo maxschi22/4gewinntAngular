@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { delay } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -35,8 +36,9 @@ export class SpiellogikService {
         if (winner) {
           this.toastr.info(`${winner} hat das Spiel gewonnen!`, 'GEWONNEN', {
             disableTimeOut: true, // Verhindert das automatische Schließen
+            closeButton: true,
           });
-          //Game Reset Bestätigung
+          //Game Reset Bestätigung TODO- Timer einbauen
           this.gameReset();
         }
         //IDEE- Eventuell ein Playback des Spiels einbauen
@@ -138,5 +140,9 @@ export class SpiellogikService {
     return null;
   }
 
-  gameReset() {}
+  gameReset() {
+    this.gameBoard.forEach((element) => {
+      element.fill('');
+    });
+  }
 }

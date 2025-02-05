@@ -84,6 +84,13 @@
   .yellow {
     background-color: rgb(238, 238, 0);
   }
+
+  .gameMenuButtons{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2%;
+  }
   
 
   @media (min-width: 768px) {

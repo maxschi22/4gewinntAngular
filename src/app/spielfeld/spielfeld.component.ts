@@ -25,5 +25,7 @@ export class SpielfeldComponent {
     this.spielService.handleClick(columnIndex); // Aufruf der Methode im Service
   }
 
-  getWinner() {}
+  gameReset() {
+    this.spielService.gameReset();
+  }
 }
