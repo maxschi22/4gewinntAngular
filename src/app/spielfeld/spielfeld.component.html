@@ -9,7 +9,7 @@
         @for (row of rows; track $index; let rowIndex = $index) {
         <div
           class="cell"
-          [ngClass]="getCellClass(rowIndex, columnIndex)"
+          [ngClass]="setCellClass(rowIndex, columnIndex)"
           (click)="handleClick(columnIndex)"
         ></div>
         }

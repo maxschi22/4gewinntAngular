@@ -15,9 +15,9 @@ export class SpielfeldComponent {
   // Den GameService injizieren
   constructor(public spielService: SpiellogikService) {}
 
-  // Methode, um die Klasse für jede Zelle zu setzen (z. B. 'red' oder 'yellow')
-  getCellClass(rowIndex: number, columnIndex: number) {
-    return this.spielService.getCellClass(rowIndex, columnIndex); // Verwende die Methode des Services
+  // Methode, um die Klasse für jede Zelle zu setzen
+  setCellClass(rowIndex: number, columnIndex: number) {
+    return this.spielService.setCellClass(rowIndex, columnIndex); // Verwende die Methode des Services
   }
 
   // Methode, die beim Klicken auf das Spielfeld aufgerufen wird
