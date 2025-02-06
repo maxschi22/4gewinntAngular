@@ -29,12 +29,14 @@ export class SpiellogikService {
     let columnFull = false; //Flag für Toast
 
     for (let row = 5; row >= 0; row--) {
+      // Reihen durchlaufen von unten nach oben
       if (!this.gameBoard[row][columnIndex]) {
+        //Wenn eine leere Reihe gefunden wird
         this.gameBoard[row][columnIndex] = this.currentPlayer; // Setze den aktuellen Spieler
         //TODO- Hier muss geprüft werden ob es einen Gewinner gibt und dann das Spiel nach einem bestätigen Button zurückgesetzt werden
         const winner = this.checkWinner();
         if (winner) {
-          this.toastr.info(`${winner} hat das Spiel gewonnen!`, 'GEWONNEN', {
+          this.toastr.success(`${winner} hat das Spiel gewonnen!`, 'GEWONNEN', {
             timeOut: 5000, // Verhindert das automatische Schließen
             closeButton: true,
           });
@@ -141,15 +143,14 @@ export class SpiellogikService {
   }
 
   gameReset() {
-    let remainingTime = 5; // Startwert für den Countdown
+    let remainingTime = 5; // Sekundenwert für den Countdown
 
     const interval = setInterval(() => {
       this.toastr.info(
         `Neues Spiel startet in ${remainingTime} Sekunden...`,
         'NEUSTART',
         {
-          timeOut: 1000, // Jeder Toast bleibt 1 Sekunde sichtbar
-          closeButton: true,
+          timeOut: 700, // Jeder TimerToast bleibt für 700ms sichtbar
         }
       );
 
