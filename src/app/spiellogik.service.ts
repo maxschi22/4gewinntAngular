@@ -35,7 +35,7 @@ export class SpiellogikService {
         const winner = this.checkWinner();
         if (winner) {
           this.toastr.info(`${winner} hat das Spiel gewonnen!`, 'GEWONNEN', {
-            disableTimeOut: true, // Verhindert das automatische Schließen
+            timeOut: 5000, // Verhindert das automatische Schließen
             closeButton: true,
           });
           //Game Reset Bestätigung TODO- Timer einbauen
@@ -141,8 +141,29 @@ export class SpiellogikService {
   }
 
   gameReset() {
-    this.gameBoard.forEach((element) => {
-      element.fill('');
-    });
+    let remainingTime = 5; // Startwert für den Countdown
+
+    const interval = setInterval(() => {
+      this.toastr.info(
+        `Neues Spiel startet in ${remainingTime} Sekunden...`,
+        'NEUSTART',
+        {
+          timeOut: 1000, // Jeder Toast bleibt 1 Sekunde sichtbar
+          closeButton: true,
+        }
+      );
+
+      remainingTime--;
+
+      if (remainingTime < 0) {
+        clearInterval(interval); // Countdown stoppen
+        this.toastr.success('Spiel wurde zurückgesetzt.', 'NEUES SPIEL');
+
+        // Spielfeld zurücksetzen
+        this.gameBoard.forEach((element) => {
+          element.fill('');
+        });
+      }
+    }, 1000);
   }
 }
