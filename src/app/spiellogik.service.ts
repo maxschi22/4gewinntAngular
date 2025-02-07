@@ -5,19 +5,19 @@ import { ToastrService } from 'ngx-toastr';
   providedIn: 'root',
 })
 export class SpiellogikService {
-  currentPlayer: string = 'Rot'; // Deklaration Startspieler
-  gameBoard: string[][]; // Deklaration des Spielbretts
+  currentPlayer: string = 'Rot'; //Initialisierung Startspieler
+  gameBoard: string[][] = []; //Initialisierung des Spielbretts
+  matchResult: string[][] = []; //Initialisierung Zustand des Spielergebnisses
 
   constructor(private toastr: ToastrService) {
     // Erstelle ein leeres Spielbrett mit 6 Zeilen und 7 Spalten
     const rows = 6;
     const cols = 7;
-    this.gameBoard = []; // Initialisiere das Spielbrett als leeres Array
 
     for (let r = 0; r < rows; r++) {
       const row = []; // Erstelle eine neue Zeile
       for (let c = 0; c < cols; c++) {
-        row.push(''); // Füge einen leeren String zur Zeile hinzu
+        row.push(''); // Füge einen leeren Wert der Zelle hinzu
       }
       this.gameBoard.push(row); // Füge die Zeile zum Spielbrett hinzu
     }
@@ -38,6 +38,7 @@ export class SpiellogikService {
         //TODO- Hier muss geprüft werden ob es einen Gewinner gibt und dann das Spiel nach einem bestätigen Button zurückgesetzt werden
         const winner = this.checkWinner();
         if (winner) {
+          this.matchResult = this.gameBoard.map((row) => [...row]);
           this.toastr.success(`${winner} hat das Spiel gewonnen!`, 'GEWONNEN', {
             timeOut: 5000, // Verhindert das automatische Schließen
             closeButton: true,
@@ -45,6 +46,7 @@ export class SpiellogikService {
           //Game Reset Bestätigung TODO- Timer einbauen
           this.gameReset();
         } else if (!winner && this.isBoardFull()) {
+          this.matchResult = this.gameBoard.map((row) => [...row]);
           this.toastr.error(
             `Das Spiel wurde mit einem Unentschieden beendet`,
             'UNENTSCHIEDEN',
@@ -208,6 +210,11 @@ export class SpiellogikService {
       }
     }
     return legalMoves;
+  }
+
+  //Endzustand des letzten Spiels anzeigen
+  showLastMatchResult() {
+    this.gameBoard = this.matchResult;
   }
 
   testDrawFunction() {

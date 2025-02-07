@@ -25,6 +25,10 @@ export class SpielfeldComponent {
     this.spielService.handleClick(columnIndex); // Aufruf der Methode im Service
   }
 
+  showLastMatchResult() {
+    this.spielService.showLastMatchResult();
+  }
+
   gameReset() {
     this.spielService.gameReset();
   }
