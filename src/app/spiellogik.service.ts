@@ -21,8 +21,8 @@ export class SpiellogikService {
       }
       this.gameBoard.push(row); // Füge die Zeile zum Spielbrett hinzu
     }
-    // //Test um zu schauen ob die DrawFunction funktioniert
-    this.testDrawFunction();
+    //Test um zu schauen ob die DrawFunction funktioniert
+    // this.testDrawFunction();
   }
 
   // Methode, um den Spielstatus zu aktualisieren, wenn auf das Spielfeld geklickt wird
