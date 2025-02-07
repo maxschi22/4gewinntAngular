@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
-import { delay } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -22,17 +21,20 @@ export class SpiellogikService {
       }
       this.gameBoard.push(row); // Füge die Zeile zum Spielbrett hinzu
     }
+    // //Test um zu schauen ob die DrawFunction funktioniert
+    this.testDrawFunction();
   }
 
   // Methode, um den Spielstatus zu aktualisieren, wenn auf das Spielfeld geklickt wird
   handleClick(columnIndex: number) {
     let columnFull = false; //Flag für Toast
 
+    // Reihen durchlaufen von unten nach oben
     for (let row = 5; row >= 0; row--) {
-      // Reihen durchlaufen von unten nach oben
+      //Wenn eine leere Reihe gefunden wird
       if (!this.gameBoard[row][columnIndex]) {
-        //Wenn eine leere Reihe gefunden wird
         this.gameBoard[row][columnIndex] = this.currentPlayer; // Setze den aktuellen Spieler
+        console.log(this.findLegalMoves());
         //TODO- Hier muss geprüft werden ob es einen Gewinner gibt und dann das Spiel nach einem bestätigen Button zurückgesetzt werden
         const winner = this.checkWinner();
         if (winner) {
@@ -41,6 +43,16 @@ export class SpiellogikService {
             closeButton: true,
           });
           //Game Reset Bestätigung TODO- Timer einbauen
+          this.gameReset();
+        } else if (!winner && this.isBoardFull()) {
+          this.toastr.error(
+            `Das Spiel wurde mit einem Unentschieden beendet`,
+            'UNENTSCHIEDEN',
+            {
+              timeOut: 5000, // Verhindert das automatische Schließen
+              closeButton: true,
+            }
+          );
           this.gameReset();
         }
         //IDEE- Eventuell ein Playback des Spiels einbauen
@@ -54,6 +66,19 @@ export class SpiellogikService {
     if (columnFull) {
       this.toastr.error('Spalte ist bereits voll!');
     }
+  }
+
+  isBoardFull() {
+    //Schleife durch alle Columns
+    for (let col = 0; col < this.gameBoard[0].length; col++) {
+      //Wenn oberste Reihe nicht voll
+      if (!this.gameBoard[0][col]) {
+        //return false
+        return false;
+      }
+    }
+    //Wenn voll dann return true
+    return true;
   }
 
   // Methode, um die Klasse für jede Zelle zu setzen
@@ -166,5 +191,76 @@ export class SpiellogikService {
         });
       }
     }, 1000);
+  }
+
+  findLegalMoves() {
+    let legalMoves: number[][] = [];
+
+    //schleife columns
+    for (let col = 0; col < this.gameBoard[0].length; col++) {
+      //schleife rows
+      for (let row = 5; row >= 0; row--) {
+        //Wenn Zelle leer
+        if (!this.gameBoard[row][col]) {
+          legalMoves.push([row, col]); // Position der legalen Zelle speichern
+          break; // schleife beenden, da wir die unterste leere Zelle gefunden haben
+        }
+      }
+    }
+    return legalMoves;
+  }
+
+  testDrawFunction() {
+    let rot = 'Rot';
+    let gelb = 'Gelb';
+    this.currentPlayer = rot;
+    const testMoves = [
+      { row: 1, col: 0, player: gelb },
+      { row: 2, col: 0, player: rot },
+      { row: 3, col: 0, player: gelb },
+      { row: 4, col: 0, player: rot },
+      { row: 5, col: 0, player: gelb },
+      { row: 0, col: 1, player: rot },
+      { row: 1, col: 1, player: gelb },
+      { row: 2, col: 1, player: rot },
+      { row: 3, col: 1, player: gelb },
+      { row: 4, col: 1, player: rot },
+      { row: 5, col: 1, player: rot },
+      { row: 0, col: 2, player: gelb },
+      { row: 1, col: 2, player: rot },
+      { row: 2, col: 2, player: rot },
+      { row: 3, col: 2, player: rot },
+      { row: 4, col: 2, player: gelb },
+      { row: 5, col: 2, player: rot },
+      { row: 0, col: 3, player: rot },
+      { row: 1, col: 3, player: gelb },
+      { row: 2, col: 3, player: gelb },
+      { row: 3, col: 3, player: gelb },
+      { row: 4, col: 3, player: rot },
+      { row: 5, col: 3, player: gelb },
+      { row: 0, col: 4, player: gelb },
+      { row: 1, col: 4, player: rot },
+      { row: 2, col: 4, player: gelb },
+      { row: 3, col: 4, player: gelb },
+      { row: 4, col: 4, player: rot },
+      { row: 5, col: 4, player: gelb },
+      { row: 0, col: 5, player: gelb },
+      { row: 1, col: 5, player: rot },
+      { row: 2, col: 5, player: gelb },
+      { row: 3, col: 5, player: rot },
+      { row: 4, col: 5, player: rot },
+      { row: 5, col: 5, player: rot },
+      { row: 0, col: 6, player: rot },
+      { row: 1, col: 6, player: gelb },
+      { row: 2, col: 6, player: rot },
+      { row: 3, col: 6, player: gelb },
+      { row: 4, col: 6, player: gelb },
+      { row: 5, col: 6, player: gelb },
+    ];
+
+    // Zuweisungen durchführen
+    testMoves.forEach((move) => {
+      this.gameBoard[move.row][move.col] = move.player;
+    });
   }
 }
