@@ -8,6 +8,7 @@ export class SpiellogikService {
   currentPlayer: string = 'Rot'; //Initialisierung Startspieler
   gameBoard: string[][] = []; //Initialisierung des Spielbretts
   matchResult: string[][] = []; //Initialisierung Zustand des Spielergebnisses
+  gameOver: boolean = false;
 
   constructor(private toastr: ToastrService) {
     // Erstelle ein leeres Spielbrett mit 6 Zeilen und 7 Spalten
@@ -24,16 +25,23 @@ export class SpiellogikService {
     //Test um zu schauen ob die DrawFunction funktioniert
     // this.testDrawFunction();
   }
-
   // Methode, um den Spielstatus zu aktualisieren, wenn auf das Spielfeld geklickt wird
   handleClick(columnIndex: number) {
+    if (this.gameOver) {
+      this.toastr.warning(
+        'Das Spiel ist vorbei! Starte ein neues Spiel.',
+        'Spiel beendet'
+      );
+      return;
+    }
+
     let columnFull = false; //Flag für Toast
 
     // Reihen durchlaufen von unten nach oben
     for (let row = 5; row >= 0; row--) {
       //Wenn eine leere Reihe gefunden wird
       if (!this.gameBoard[row][columnIndex]) {
-        this.gameBoard[row][columnIndex] = this.currentPlayer; // Setze den aktuellen Spieler
+        this.makeMove(row, columnIndex); // Setze den aktuellen Spieler
         console.log(this.findLegalMoves());
         //TODO- Hier muss geprüft werden ob es einen Gewinner gibt und dann das Spiel nach einem bestätigen Button zurückgesetzt werden
         const winner = this.checkWinner();
@@ -44,6 +52,7 @@ export class SpiellogikService {
             closeButton: true,
           });
           //Game Reset Bestätigung TODO- Timer einbauen
+          this.gameOver = true;
           this.gameReset();
         } else if (!winner && this.isBoardFull()) {
           this.matchResult = this.gameBoard.map((row) => [...row]);
@@ -55,6 +64,7 @@ export class SpiellogikService {
               closeButton: true,
             }
           );
+          this.gameOver = true;
           this.gameReset();
         }
         //IDEE- Eventuell ein Playback des Spiels einbauen
@@ -68,6 +78,15 @@ export class SpiellogikService {
     if (columnFull) {
       this.toastr.error('Spalte ist bereits voll!');
     }
+  }
+
+  makeMove(rowIndex: number, columnIndex: number) {
+    this.gameBoard[rowIndex][columnIndex] = this.currentPlayer; // Setze den aktuellen Spieler
+  }
+
+  undoMove(rowIndex: number, columnIndex: number) {
+    this.gameBoard[rowIndex][columnIndex] = '';
+    this.currentPlayer = this.currentPlayer === 'Rot' ? 'Gelb' : 'Rot';
   }
 
   isBoardFull() {
@@ -169,6 +188,16 @@ export class SpiellogikService {
     return null;
   }
 
+  instantGameReset() {
+    this.toastr.success('Spiel wurde zurückgesetzt.', 'NEUES SPIEL');
+    this.gameOver = false;
+
+    // Spielfeld zurücksetzen
+    this.gameBoard.forEach((element) => {
+      element.fill('');
+    });
+  }
+
   gameReset() {
     let remainingTime = 5; // Sekundenwert für den Countdown
 
@@ -191,6 +220,7 @@ export class SpiellogikService {
         this.gameBoard.forEach((element) => {
           element.fill('');
         });
+        this.gameOver = false;
       }
     }, 1000);
   }
@@ -215,6 +245,7 @@ export class SpiellogikService {
   //Endzustand des letzten Spiels anzeigen
   showLastMatchResult() {
     this.gameBoard = this.matchResult;
+    this.gameOver = true;
   }
 
   testDrawFunction() {

@@ -12,7 +12,7 @@ export class SpielfeldComponent {
   rows = Array(6).fill(0); // Erstellt ein Array mit 6 Einträgen
   columns = Array(7).fill(0); // Erstellt ein Array mit 7 Einträgen
 
-  // Den GameService injizieren
+  // Den spielService injizieren
   constructor(public spielService: SpiellogikService) {}
 
   // Methode, um die Klasse für jede Zelle zu setzen
@@ -27,6 +27,10 @@ export class SpielfeldComponent {
 
   showLastMatchResult() {
     this.spielService.showLastMatchResult();
+  }
+
+  instantGameReset() {
+    this.spielService.instantGameReset();
   }
 
   gameReset() {
