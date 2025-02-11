@@ -86,7 +86,6 @@ export class SpiellogikService {
 
   undoMove(rowIndex: number, columnIndex: number) {
     this.gameBoard[rowIndex][columnIndex] = '';
-    this.currentPlayer = this.currentPlayer === 'Rot' ? 'Gelb' : 'Rot';
   }
 
   isBoardFull() {
@@ -200,6 +199,7 @@ export class SpiellogikService {
 
   gameReset() {
     let remainingTime = 5; // Sekundenwert für den Countdown
+    this.gameOver = false;
 
     const interval = setInterval(() => {
       this.toastr.info(
@@ -220,7 +220,6 @@ export class SpiellogikService {
         this.gameBoard.forEach((element) => {
           element.fill('');
         });
-        this.gameOver = false;
       }
     }, 1000);
   }
