@@ -199,7 +199,6 @@ export class SpiellogikService {
 
   gameReset() {
     let remainingTime = 5; // Sekundenwert für den Countdown
-    this.gameOver = false;
 
     const interval = setInterval(() => {
       this.toastr.info(
@@ -220,6 +219,8 @@ export class SpiellogikService {
         this.gameBoard.forEach((element) => {
           element.fill('');
         });
+
+        this.gameOver = false;
       }
     }, 1000);
   }
