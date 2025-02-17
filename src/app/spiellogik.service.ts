@@ -50,33 +50,9 @@ export class SpiellogikService {
         //TODO- Hier muss geprüft werden ob es einen Gewinner gibt und dann das Spiel nach einem bestätigen Button zurückgesetzt werden
         const winner = this.checkWinner();
         if (winner) {
-          if (winner === '1') {
-            this.toastr.success(`Rot hat das Spiel gewonnen!`, 'GEWONNEN', {
-              timeOut: 5000, // Verhindert das automatische Schließen
-              closeButton: true,
-            });
-          } else if (winner === '2') {
-            this.toastr.success(`Gelb hat das Spiel gewonnen!`, 'GEWONNEN', {
-              timeOut: 5000, // Verhindert das automatische Schließen
-              closeButton: true,
-            });
-          }
-          this.matchResult = this.gameBoard.map((row) => [...row]);
-          //Game Reset Bestätigung TODO- Timer einbauen
-          this.gameOver = true;
-          this.gameReset();
+          this.handleWinner(winner);
         } else if (!winner && this.isBoardFull()) {
-          this.matchResult = this.gameBoard.map((row) => [...row]);
-          this.toastr.error(
-            `Das Spiel wurde mit einem Unentschieden beendet`,
-            'UNENTSCHIEDEN',
-            {
-              timeOut: 5000, // Verhindert das automatische Schließen
-              closeButton: true,
-            }
-          );
-          this.gameOver = true;
-          this.gameReset();
+          this.handleDraw();
         }
         //IDEE- Eventuell ein Playback des Spiels einbauen
         this.currentPlayer = this.currentPlayer === '1' ? '2' : '1'; // Wechsel den Spieler
@@ -89,6 +65,38 @@ export class SpiellogikService {
     if (columnFull) {
       this.toastr.error('Spalte ist bereits voll!');
     }
+  }
+
+  handleWinner(winner: string) {
+    if (winner === '1') {
+      this.toastr.success(`Rot hat das Spiel gewonnen!`, 'GEWONNEN', {
+        timeOut: 5000, // Verhindert das automatische Schließen
+        closeButton: true,
+      });
+    } else if (winner === '2') {
+      this.toastr.success(`Gelb hat das Spiel gewonnen!`, 'GEWONNEN', {
+        timeOut: 5000, // Verhindert das automatische Schließen
+        closeButton: true,
+      });
+    }
+    this.matchResult = this.gameBoard.map((row) => [...row]);
+    //Game Reset Bestätigung TODO- Timer einbauen
+    this.gameOver = true;
+    this.gameReset();
+  }
+
+  handleDraw() {
+    this.matchResult = this.gameBoard.map((row) => [...row]);
+    this.toastr.error(
+      `Das Spiel wurde mit einem Unentschieden beendet`,
+      'UNENTSCHIEDEN',
+      {
+        timeOut: 5000, // Verhindert das automatische Schließen
+        closeButton: true,
+      }
+    );
+    this.gameOver = true;
+    this.gameReset();
   }
 
   makeMove(rowIndex: number, columnIndex: number) {
