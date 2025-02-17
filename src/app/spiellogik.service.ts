@@ -5,23 +5,27 @@ import { ToastrService } from 'ngx-toastr';
   providedIn: 'root',
 })
 export class SpiellogikService {
-  currentPlayer: string = 'Rot'; //Initialisierung Startspieler
+  currentPlayer: string = '1'; //Initialisierung Startspieler
   gameBoard: string[][] = []; //Initialisierung des Spielbretts
   matchResult: string[][] = []; //Initialisierung Zustand des Spielergebnisses
-  gameOver: boolean = false;
+  gameOver: boolean = false; //Initialisierung Flag gameOver
 
+  //DI
   constructor(private toastr: ToastrService) {
     // Erstelle ein leeres Spielbrett mit 6 Zeilen und 7 Spalten
     const rows = 6;
     const cols = 7;
 
     for (let r = 0; r < rows; r++) {
-      const row = []; // Erstelle eine neue Zeile
+      const row = []; // neue zeile erstellen
       for (let c = 0; c < cols; c++) {
-        row.push(''); // Füge einen leeren Wert der Zelle hinzu
+        row.push(''); // leeren Wert zur zelle hinzufügen
       }
-      this.gameBoard.push(row); // Füge die Zeile zum Spielbrett hinzu
+      console.log(row);
+      this.gameBoard.push(row); // Füge die Zeile zum Spielbrett hinzu, Zeile ist hier jeweils ein Array mit 7 Werten
     }
+    //Gameboard wird zu einem Array welches 6 Arrays enthält
+    console.log(this.gameBoard);
     //Test um zu schauen ob die DrawFunction funktioniert
     // this.testDrawFunction();
   }
@@ -46,11 +50,18 @@ export class SpiellogikService {
         //TODO- Hier muss geprüft werden ob es einen Gewinner gibt und dann das Spiel nach einem bestätigen Button zurückgesetzt werden
         const winner = this.checkWinner();
         if (winner) {
+          if (winner === '1') {
+            this.toastr.success(`Rot hat das Spiel gewonnen!`, 'GEWONNEN', {
+              timeOut: 5000, // Verhindert das automatische Schließen
+              closeButton: true,
+            });
+          } else if (winner === '2') {
+            this.toastr.success(`Gelb hat das Spiel gewonnen!`, 'GEWONNEN', {
+              timeOut: 5000, // Verhindert das automatische Schließen
+              closeButton: true,
+            });
+          }
           this.matchResult = this.gameBoard.map((row) => [...row]);
-          this.toastr.success(`${winner} hat das Spiel gewonnen!`, 'GEWONNEN', {
-            timeOut: 5000, // Verhindert das automatische Schließen
-            closeButton: true,
-          });
           //Game Reset Bestätigung TODO- Timer einbauen
           this.gameOver = true;
           this.gameReset();
@@ -68,7 +79,7 @@ export class SpiellogikService {
           this.gameReset();
         }
         //IDEE- Eventuell ein Playback des Spiels einbauen
-        this.currentPlayer = this.currentPlayer === 'Rot' ? 'Gelb' : 'Rot'; // Wechsel den Spieler
+        this.currentPlayer = this.currentPlayer === '1' ? '2' : '1'; // Wechsel den Spieler
         break;
       }
       if (row === 0) {
@@ -104,7 +115,7 @@ export class SpiellogikService {
   // Methode, um die Klasse für jede Zelle zu setzen
   setCellClass(rowIndex: number, columnIndex: number) {
     const cell = this.gameBoard[rowIndex][columnIndex];
-    return cell === 'Rot' ? 'red' : cell === 'Gelb' ? 'yellow' : '';
+    return cell === '1' ? 'red' : cell === '2' ? 'yellow' : '';
   }
 
   checkWinner() {
@@ -249,8 +260,8 @@ export class SpiellogikService {
   }
 
   testDrawFunction() {
-    let rot = 'Rot';
-    let gelb = 'Gelb';
+    let rot = '1';
+    let gelb = '2';
     this.currentPlayer = rot;
     const testMoves = [
       { row: 1, col: 0, player: gelb },
