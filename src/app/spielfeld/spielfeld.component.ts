@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { SpiellogikService } from '../spiellogik.service';
 import { CommonModule } from '@angular/common';
+import { ComputerlogikService } from '../computerlogik.service';
 
 @Component({
   selector: 'app-spielfeld',
@@ -13,7 +14,10 @@ export class SpielfeldComponent {
   columns = Array(7).fill(0); // Erstellt ein Array mit 7 Einträgen
 
   // Den spielService injizieren
-  constructor(public spielService: SpiellogikService) {}
+  constructor(
+    public spielService: SpiellogikService,
+    public computerService: ComputerlogikService
+  ) {}
 
   // Methode, um die Klasse für jede Zelle zu setzen
   setCellClass(rowIndex: number, columnIndex: number) {
@@ -35,5 +39,9 @@ export class SpielfeldComponent {
 
   gameReset() {
     this.spielService.gameReset();
+  }
+
+  computerMakeMove() {
+    this.computerService.makeComputerMove();
   }
 }
