@@ -6,15 +6,17 @@ import { SpiellogikService } from './spiellogik.service';
 })
 export class ComputerlogikService {
   bestMove: number[] = [];
-  maxDepth: number = 3; // Maximale Suchtiefe
+  maxDepth: number = 5; // Maximale Suchtiefe
 
   constructor(public spielService: SpiellogikService) {}
 
+  //Muss noch komplett überarbeitet werden mit switch und checkwin handlewin handleclick
   makeComputerMove() {
     this.bestMove = [];
     let evaluation = this.maximize(0);
     let [bestRow, bestColumn] = this.bestMove;
     this.spielService.makeMove(bestRow, bestColumn);
+    this.spielService.switchPlayer();
     console.log(`evaluation: ${evaluation}`);
   }
 
@@ -82,7 +84,7 @@ export class ComputerlogikService {
     let score = 0;
 
     // Boardgröße
-    const board = this.spielService.gameBoard; // 2D-Array des Spiels
+    const board = this.spielService.gameBoard;
     const rows = board.length;
     const cols = board[0].length;
 

@@ -55,7 +55,7 @@ export class SpiellogikService {
           this.handleDraw();
         }
         //IDEE- Eventuell ein Playback des Spiels einbauen
-        this.currentPlayer = this.currentPlayer === '1' ? '2' : '1'; // Wechsel den Spieler
+        this.switchPlayer();
         break;
       }
       if (row === 0) {
@@ -65,6 +65,10 @@ export class SpiellogikService {
     if (columnFull) {
       this.toastr.error('Spalte ist bereits voll!');
     }
+  }
+
+  switchPlayer() {
+    this.currentPlayer = this.currentPlayer === '1' ? '2' : '1'; // Wechsel den Spieler
   }
 
   handleWinner(winner: string) {
