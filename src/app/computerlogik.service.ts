@@ -11,6 +11,7 @@ export class ComputerlogikService {
   constructor(public spielService: SpiellogikService) {}
 
   makeComputerMove() {
+    console.log(this.maxDepth);
     this.bestMove = [];
     // den aktuellen Spieler für die Simulation nutzen
     const currentPlayer = this.spielService.currentPlayer;

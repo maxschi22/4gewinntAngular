@@ -2,6 +2,18 @@
   <div class="game-container">
     <h1>4 Gewinnt</h1>
 
+    <label for="customRange1" class="form-label"
+      >Schwierigkeitsgrad: {{ this.computerService.maxDepth }}</label
+    >
+    <input
+      type="range"
+      class="form-range"
+      [(ngModel)]="this.computerService.maxDepth"
+      min="1"
+      max="7"
+      id="customRange1"
+    />
+
     <!-- Spielfeld -->
     <div class="board">
       @for (column of columns; track $index; let columnIndex = $index) {

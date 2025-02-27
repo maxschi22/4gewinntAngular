@@ -3,10 +3,11 @@ import { SpiellogikService } from '../spiellogik.service';
 import { CommonModule } from '@angular/common';
 import { ComputerlogikService } from '../computerlogik.service';
 import { ToastrService } from 'ngx-toastr';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-spielfeld',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './spielfeld.component.html',
   styleUrls: ['./spielfeld.component.css'],
 })
@@ -41,10 +42,12 @@ export class SpielfeldComponent {
   handleClick(columnIndex: number) {
     this.spielService.handleClick(columnIndex); // Aufruf der Methode im Service
 
-    if (this.ai) {
-      setTimeout(() => {
-        this.computerMakeMove(); // Computer macht seinen Zug
-      }, 500);
+    if (!this.spielService.checkWinner() && !this.spielService.isBoardFull()) {
+      if (this.ai) {
+        setTimeout(() => {
+          this.computerMakeMove(); // Computer macht seinen Zug
+        }, 500);
+      }
     }
   }
 
