@@ -6,6 +6,8 @@
     align-items: center;
     font-family: system-ui, -apple-system, sans-serif;
     padding: 1rem;
+    --player1: rgb(233, 0, 0);
+    --player2: rgb(218, 214, 0);
   }
 
   .game-container {
@@ -64,25 +66,17 @@
     border-radius: 50%;
   }
 
-  .player-1 .player-token {
-    background-color: rgb(233, 0, 0);
+  .player-1 .player-token, .red {
+    background-color: var(--player1);
   }
 
-  .player-2 .player-token {
-    background-color: rgb(238, 238, 0);
+  .player-2 .player-token, .yellow {
+    background-color: var(--player2);
   }
 
   .player-name {
     color: white;
     font-weight: 600;
-  }
-
-  .red {
-    background-color: rgb(233, 0, 0);
-  }
-  
-  .yellow {
-    background-color: rgb(238, 238, 0);
   }
 
   .gameMenuButtons{

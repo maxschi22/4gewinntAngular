@@ -6,163 +6,194 @@ import { SpiellogikService } from './spiellogik.service';
 })
 export class ComputerlogikService {
   bestMove: number[] = [];
-  maxDepth: number = 5; // Maximale Suchtiefe
+  maxDepth: number = 7;
 
   constructor(public spielService: SpiellogikService) {}
 
-  //Muss noch komplett überarbeitet werden mit switch und checkwin handlewin handleclick
   makeComputerMove() {
     this.bestMove = [];
-    let evaluation = this.maximize(0);
-    let [bestRow, bestColumn] = this.bestMove;
-    this.spielService.makeMove(bestRow, bestColumn);
-    this.spielService.switchPlayer();
-    console.log(`evaluation: ${evaluation}`);
+    // den aktuellen Spieler für die Simulation nutzen
+    const currentPlayer = this.spielService.currentPlayer;
+    // Sicherstellen, dass der Computer der aktuelle Spieler für die Simulation ist
+    this.spielService.currentPlayer = this.spielService.COMPUTER_PLAYER;
+
+    let evaluation = this.minimax(0, true);
+
+    // Original Spieler herstellen
+    this.spielService.currentPlayer = currentPlayer;
+
+    // besten Move der gefunden wurde durchführen
+    if (this.bestMove.length === 2) {
+      let [bestRow, bestColumn] = this.bestMove;
+      this.spielService.makeMove(bestRow, bestColumn);
+      this.spielService.switchPlayer();
+      console.log(
+        `Computer wählt: Feld [(${bestColumn}, ${bestRow}] mit evaluation: ${evaluation}`
+      );
+    } else {
+      console.error('Kein Gültigen Zug für Computer gefunden!');
+    }
+
+    const winner = this.spielService.checkWinner();
+    if (winner) {
+      this.spielService.handleWinner(winner);
+      console.log(`Spiel vorbei! Gewinner: ${winner}`);
+    } else if (!winner && this.spielService.isBoardFull()) {
+      this.spielService.handleDraw();
+    }
   }
 
-  maximize(depth: number) {
+  minimax(depth: number, isMaximizing: boolean): number {
+    // Check terminal states
     if (this.spielService.checkWinner()) {
-      // Minimierender Spieler hat letzte Runde gewonnen
-      return -1;
+      return isMaximizing ? -1000 : 1000; // If winner found, previous move caused it
     }
+
     if (this.spielService.isBoardFull()) {
-      // Unentschieden
-      return 0;
+      return 0; // Draw
     }
+
     if (depth >= this.maxDepth) {
-      // Wenn die maximale Tiefe erreicht ist, bewerten
       return this.evaluateBoard();
     }
 
-    let maxValue = -Infinity;
     const legalMoves = this.spielService.findLegalMoves();
 
-    for (const [moveRow, moveColumn] of legalMoves) {
-      this.spielService.makeMove(moveRow, moveColumn);
-      let value = this.minimize(depth + 1);
-      this.spielService.undoMove(moveRow, moveColumn);
-      if (value > maxValue) {
-        maxValue = value;
-        if (depth === 0) {
-          this.bestMove = [moveRow, moveColumn];
+    if (isMaximizing) {
+      // Computer's turn (maximizing)
+      let maxEval = -Infinity;
+
+      for (const [moveRow, moveColumn] of legalMoves) {
+        // Save current state
+        const originalPlayer = this.spielService.currentPlayer;
+
+        // Make move as computer
+        this.spielService.currentPlayer = this.spielService.COMPUTER_PLAYER;
+        this.spielService.makeMove(moveRow, moveColumn);
+
+        // Evaluate this move
+        const evaluation = this.minimax(depth + 1, false);
+
+        // Undo move
+        this.spielService.undoMove(moveRow, moveColumn);
+        this.spielService.currentPlayer = originalPlayer;
+
+        // Update best move
+        if (evaluation > maxEval) {
+          maxEval = evaluation;
+          if (depth === 0) {
+            this.bestMove = [moveRow, moveColumn];
+          }
         }
       }
-    }
-    return maxValue;
-  }
 
-  minimize(depth: number) {
-    if (this.spielService.checkWinner()) {
-      // Minimierender Spieler hat letzte Runde gewonnen
-      return 1;
-    }
-    if (this.spielService.isBoardFull()) {
-      // Unentschieden
-      return 0;
-    }
-    if (depth >= this.maxDepth) {
-      // Wenn die maximale Tiefe erreicht ist, bewerten
-      return this.evaluateBoard();
-    }
+      return maxEval;
+    } else {
+      // Human's turn (minimizing)
+      let minEval = Infinity;
 
-    let minValue = +Infinity;
-    const legalMoves = this.spielService.findLegalMoves();
+      for (const [moveRow, moveColumn] of legalMoves) {
+        // Save current state
+        const originalPlayer = this.spielService.currentPlayer;
 
-    for (const [moveRow, moveColumn] of legalMoves) {
-      this.spielService.makeMove(moveRow, moveColumn);
-      let value = this.maximize(depth + 1);
-      this.spielService.undoMove(moveRow, moveColumn);
-      if (value < minValue) {
-        minValue = value;
+        // Make move as human
+        this.spielService.currentPlayer = this.spielService.HUMAN_PLAYER;
+        this.spielService.makeMove(moveRow, moveColumn);
+
+        // Evaluate this move
+        const evaluation = this.minimax(depth + 1, true);
+
+        // Undo move
+        this.spielService.undoMove(moveRow, moveColumn);
+        this.spielService.currentPlayer = originalPlayer;
+
+        // Update best value
+        minEval = Math.min(minEval, evaluation);
       }
+
+      return minEval;
     }
-    return minValue;
   }
 
-  // Beispielhafte Bewertungsfunktion
   evaluateBoard(): number {
     let score = 0;
-
-    // Boardgröße
     const board = this.spielService.gameBoard;
     const rows = board.length;
     const cols = board[0].length;
 
-    // Bewertungsfunktion für eine Reihe
-    const evaluateLine = (line: string[]): number => {
-      let score = 0;
-      let playerCount = 0;
+    // Helper function to get player value
+    const getPlayerValue = (cell: any): number => {
+      if (cell === this.spielService.COMPUTER_PLAYER) return 1; // Computer
+      if (cell === this.spielService.HUMAN_PLAYER) return -1; // Opponent
+      return 0; // Empty
+    };
+
+    // Evaluate window of 4 cells
+    const evaluateWindow = (window: any[]): number => {
+      let computerCount = 0;
       let opponentCount = 0;
       let emptyCount = 0;
 
-      for (let i = 0; i < line.length; i++) {
-        if (line[i] === 'Computer') {
-          playerCount++;
-        } else if (line[i] === 'Gegner') {
-          opponentCount++;
-        } else {
-          emptyCount++;
-        }
-      }
+      window.forEach((cell) => {
+        const value = getPlayerValue(cell);
+        if (value === 1) computerCount++;
+        else if (value === -1) opponentCount++;
+        else emptyCount++;
+      });
 
-      // Bewertung für den Computer: +10 für jeden eigenen Stein in einer Reihe
-      // Bewertung für den Gegner: -10 für jeden gegnerischen Stein in einer Reihe
-      if (playerCount > 0 && opponentCount === 0) {
-        score += playerCount * 10;
-        if (emptyCount > 0) {
-          score += emptyCount * 2; // Offene Zellen, die dem Computer helfen können
-        }
-      }
-
-      // Bewertung für den Gegner: Negativ für die gleiche Logik
-      if (opponentCount > 0 && playerCount === 0) {
-        score -= opponentCount * 10;
-        if (emptyCount > 0) {
-          score -= emptyCount * 2; // Offene Zellen, die dem Gegner helfen können
-        }
-      }
-
-      return score;
+      if (computerCount === 4) return 100;
+      if (opponentCount === 4) return -100;
+      if (computerCount === 3 && emptyCount === 1) return 5;
+      if (opponentCount === 3 && emptyCount === 1) return -5;
+      if (computerCount === 2 && emptyCount === 2) return 2;
+      if (opponentCount === 2 && emptyCount === 2) return -2;
+      return 0;
     };
 
-    // Horizontale Bewertungen
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col <= cols - 4; col++) {
-        let line = board[row].slice(col, col + 4); // Holt eine horizontale Linie
-        score += evaluateLine(line);
+    // Horizontal
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c <= cols - 4; c++) {
+        const window = board[r].slice(c, c + 4);
+        score += evaluateWindow(window);
       }
     }
 
-    // Vertikale Bewertungen
-    for (let col = 0; col < cols; col++) {
-      for (let row = 0; row <= rows - 4; row++) {
-        let line = [];
-        for (let i = 0; i < 4; i++) {
-          line.push(board[row + i][col]); // Holt eine vertikale Linie
-        }
-        score += evaluateLine(line);
+    // Vertical
+    for (let c = 0; c < cols; c++) {
+      for (let r = 0; r <= rows - 4; r++) {
+        const window = [
+          board[r][c],
+          board[r + 1][c],
+          board[r + 2][c],
+          board[r + 3][c],
+        ];
+        score += evaluateWindow(window);
       }
     }
 
-    // Diagonale Bewertungen (von links oben nach rechts unten)
-    for (let row = 0; row <= rows - 4; row++) {
-      for (let col = 0; col <= cols - 4; col++) {
-        let line = [];
-        for (let i = 0; i < 4; i++) {
-          line.push(board[row + i][col + i]); // Diagonale von oben links nach unten rechts
-        }
-        score += evaluateLine(line);
+    // Diagonal positive slope
+    for (let r = 0; r <= rows - 4; r++) {
+      for (let c = 0; c <= cols - 4; c++) {
+        const window = [
+          board[r][c],
+          board[r + 1][c + 1],
+          board[r + 2][c + 2],
+          board[r + 3][c + 3],
+        ];
+        score += evaluateWindow(window);
       }
     }
 
-    // Diagonale Bewertungen (von rechts oben nach links unten)
-    for (let row = 0; row <= rows - 4; row++) {
-      for (let col = 3; col < cols; col++) {
-        let line = [];
-        for (let i = 0; i < 4; i++) {
-          line.push(board[row + i][col - i]); // Diagonale von oben rechts nach unten links
-        }
-        score += evaluateLine(line);
+    // Diagonal negative slope
+    for (let r = 0; r <= rows - 4; r++) {
+      for (let c = 3; c < cols; c++) {
+        const window = [
+          board[r][c],
+          board[r + 1][c - 1],
+          board[r + 2][c - 2],
+          board[r + 3][c - 3],
+        ];
+        score += evaluateWindow(window);
       }
     }
 

@@ -5,6 +5,9 @@ import { ToastrService } from 'ngx-toastr';
   providedIn: 'root',
 })
 export class SpiellogikService {
+  readonly HUMAN_PLAYER: string = '1';
+  readonly COMPUTER_PLAYER: string = '2';
+
   currentPlayer: string = '1'; //Initialisierung Startspieler
   gameBoard: string[][] = []; //Initialisierung des Spielbretts
   matchResult: string[][] = []; //Initialisierung Zustand des Spielergebnisses
@@ -68,16 +71,19 @@ export class SpiellogikService {
   }
 
   switchPlayer() {
-    this.currentPlayer = this.currentPlayer === '1' ? '2' : '1'; // Wechsel den Spieler
+    this.currentPlayer =
+      this.currentPlayer === this.HUMAN_PLAYER
+        ? this.COMPUTER_PLAYER
+        : this.HUMAN_PLAYER;
   }
 
   handleWinner(winner: string) {
-    if (winner === '1') {
+    if (winner === this.HUMAN_PLAYER) {
       this.toastr.success(`Rot hat das Spiel gewonnen!`, 'GEWONNEN', {
         timeOut: 5000, // Verhindert das automatische Schließen
         closeButton: true,
       });
-    } else if (winner === '2') {
+    } else if (winner === this.COMPUTER_PLAYER) {
       this.toastr.success(`Gelb hat das Spiel gewonnen!`, 'GEWONNEN', {
         timeOut: 5000, // Verhindert das automatische Schließen
         closeButton: true,
@@ -127,7 +133,11 @@ export class SpiellogikService {
   // Methode, um die Klasse für jede Zelle zu setzen
   setCellClass(rowIndex: number, columnIndex: number) {
     const cell = this.gameBoard[rowIndex][columnIndex];
-    return cell === '1' ? 'red' : cell === '2' ? 'yellow' : '';
+    return cell === this.HUMAN_PLAYER
+      ? 'red'
+      : cell === this.COMPUTER_PLAYER
+      ? 'yellow'
+      : '';
   }
 
   checkWinner() {
