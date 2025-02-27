@@ -28,7 +28,7 @@ export class ComputerlogikService {
       this.spielService.makeMove(bestRow, bestColumn);
       this.spielService.switchPlayer();
       console.log(
-        `Computer wählt: Feld [(${bestColumn}, ${bestRow}] mit evaluation: ${evaluation}`
+        `Computer wählt: Feld [${bestColumn}, ${bestRow}] mit Bewertung: ${evaluation}`
       );
     } else {
       console.error('Kein Gültigen Zug für Computer gefunden!');
@@ -60,11 +60,11 @@ export class ComputerlogikService {
     const legalMoves = this.spielService.findLegalMoves();
 
     if (isMaximizing) {
-      // Computer's turn (maximizing)
+      // Computerzug (maximizing)
       let maxEval = -Infinity;
 
       for (const [moveRow, moveColumn] of legalMoves) {
-        // Save current state
+        // Aktuellen Status speichern
         const originalPlayer = this.spielService.currentPlayer;
 
         // Make move as computer
@@ -89,7 +89,7 @@ export class ComputerlogikService {
 
       return maxEval;
     } else {
-      // Human's turn (minimizing)
+      // Spieler an der Reihe (minimizing)
       let minEval = Infinity;
 
       for (const [moveRow, moveColumn] of legalMoves) {
@@ -121,14 +121,14 @@ export class ComputerlogikService {
     const rows = board.length;
     const cols = board[0].length;
 
-    // Helper function to get player value
+    // Helferfunktion um Spielerwert zu erhalten
     const getPlayerValue = (cell: any): number => {
       if (cell === this.spielService.COMPUTER_PLAYER) return 1; // Computer
-      if (cell === this.spielService.HUMAN_PLAYER) return -1; // Opponent
-      return 0; // Empty
+      if (cell === this.spielService.HUMAN_PLAYER) return -1; // Gegner
+      return 0; //leer
     };
 
-    // Evaluate window of 4 cells
+    // Bewertung
     const evaluateWindow = (window: any[]): number => {
       let computerCount = 0;
       let opponentCount = 0;
@@ -141,7 +141,7 @@ export class ComputerlogikService {
         else emptyCount++;
       });
 
-      if (computerCount === 4) return 100;
+      if (computerCount === 4) return 1000;
       if (opponentCount === 4) return -100;
       if (computerCount === 3 && emptyCount === 1) return 5;
       if (opponentCount === 3 && emptyCount === 1) return -5;
@@ -158,7 +158,7 @@ export class ComputerlogikService {
       }
     }
 
-    // Vertical
+    // Vertikal
     for (let c = 0; c < cols; c++) {
       for (let r = 0; r <= rows - 4; r++) {
         const window = [
@@ -171,7 +171,7 @@ export class ComputerlogikService {
       }
     }
 
-    // Diagonal positive slope
+    // Diagonal links oben nach rechts unten
     for (let r = 0; r <= rows - 4; r++) {
       for (let c = 0; c <= cols - 4; c++) {
         const window = [
@@ -184,7 +184,7 @@ export class ComputerlogikService {
       }
     }
 
-    // Diagonal negative slope
+    // Diagonal rechts oben nach links unten
     for (let r = 0; r <= rows - 4; r++) {
       for (let c = 3; c < cols; c++) {
         const window = [

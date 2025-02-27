@@ -27,6 +27,10 @@ export class SpielfeldComponent {
   // Methode, die beim Klicken auf das Spielfeld aufgerufen wird
   handleClick(columnIndex: number) {
     this.spielService.handleClick(columnIndex); // Aufruf der Methode im Service
+
+    setTimeout(() => {
+      this.computerMakeMove(); // Computer macht seinen Zug
+    }, 500);
   }
 
   showLastMatchResult() {
