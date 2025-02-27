@@ -228,6 +228,7 @@ export class SpiellogikService {
     this.gameBoard.forEach((element) => {
       element.fill('');
     });
+    this.currentPlayer = '1';
   }
 
   gameReset() {
@@ -256,6 +257,7 @@ export class SpiellogikService {
         this.gameOver = false;
       }
     }, 1000);
+    this.currentPlayer = '1';
   }
 
   findLegalMoves() {
@@ -277,6 +279,10 @@ export class SpiellogikService {
 
   //Endzustand des letzten Spiels anzeigen
   showLastMatchResult() {
+    if (this.matchResult.length === 0) {
+      this.toastr.info('Kein vorheriger Spielstand vorhanden.', 'INFO');
+      return;
+    }
     this.gameBoard = this.matchResult;
     this.gameOver = true;
   }

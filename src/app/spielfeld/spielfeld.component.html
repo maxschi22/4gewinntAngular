@@ -24,14 +24,21 @@
         <span class="player-name">Spieler 1</span>
       </div>
       <div class="player player-2">
+        @if(ai){
+        <span class="player-name">Computer</span>
+        } @else{
         <span class="player-name">Spieler 2</span>
+        }
         <div class="player-token"></div>
       </div>
     </div>
     <div class="gameMenuButtons">
-      <button (click)="gameReset()">2 Spieler</button
-      ><button (click)="computerMakeMove()">Computer</button
-      ><button (click)="showLastMatchResult()">
+      @if(ai){
+      <button (click)="startTwoPlayerGame()">2 Spieler</button>
+      } @else {
+      <button (click)="startAIGame()">Computer</button>
+      }
+      <button (click)="showLastMatchResult()">
         Ergebnis des letzten Spiels anzeigen</button
       ><button (click)="instantGameReset()">Reset</button>
     </div>
