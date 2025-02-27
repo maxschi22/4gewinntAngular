@@ -2,6 +2,7 @@
   <div class="game-container">
     <h1>4 Gewinnt</h1>
 
+    @if(ai){
     <label for="customRange1" class="form-label"
       >Schwierigkeitsgrad: {{ this.computerService.maxDepth }}</label
     >
@@ -13,6 +14,7 @@
       max="7"
       id="customRange1"
     />
+    }
 
     <!-- Spielfeld -->
     <div class="board">
