@@ -8,10 +8,10 @@ export class SpiellogikService {
   readonly HUMAN_PLAYER: string = '1';
   readonly COMPUTER_PLAYER: string = '2';
 
-  currentPlayer: string = '1'; //Initialisierung Startspieler
-  gameBoard: string[][] = []; //Initialisierung des Spielbretts
-  matchResult: string[][] = []; //Initialisierung Zustand des Spielergebnisses
-  gameOver: boolean = false; //Initialisierung Flag gameOver
+  currentPlayer: string = '1'; //Startspieler
+  gameBoard: string[][] = []; //Spielbrett
+  matchResult: string[][] = []; //Zustand des Spielergebnisses
+  gameOver: boolean = false; //Flag gameOver
 
   //DI
   constructor(private toastr: ToastrService) {
