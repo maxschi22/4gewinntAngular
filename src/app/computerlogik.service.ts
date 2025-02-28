@@ -23,7 +23,7 @@ export class ComputerlogikService {
     // Original Spieler herstellen
     this.spielService.currentPlayer = currentPlayer;
 
-    // besten Move der gefunden wurde durchführen
+    // besten Move der gefunden wurde X/Y durchführen
     if (this.bestMove.length === 2) {
       let [bestRow, bestColumn] = this.bestMove;
       this.spielService.makeMove(bestRow, bestColumn);
@@ -45,15 +45,16 @@ export class ComputerlogikService {
   }
 
   minimax(depth: number, isMaximizing: boolean): number {
-    // Check terminal states
+    // Gewinner prüfen
     if (this.spielService.checkWinner()) {
-      return isMaximizing ? -1000 : 1000; // If winner found, previous move caused it
+      return isMaximizing ? -1000 : 1000;
     }
 
     if (this.spielService.isBoardFull()) {
-      return 0; // Draw
+      return 0; // Unentschieden
     }
 
+    // Wenn maximale Tiefe erreicht ist, bewerte das Board
     if (depth >= this.maxDepth) {
       return this.evaluateBoard();
     }
@@ -68,18 +69,18 @@ export class ComputerlogikService {
         // Aktuellen Status speichern
         const originalPlayer = this.spielService.currentPlayer;
 
-        // Make move as computer
+        // Move ausführen
         this.spielService.currentPlayer = this.spielService.COMPUTER_PLAYER;
         this.spielService.makeMove(moveRow, moveColumn);
 
-        // Evaluate this move
+        // Move bewerten
         const evaluation = this.minimax(depth + 1, false);
 
-        // Undo move
+        // Move Rückgängig machen
         this.spielService.undoMove(moveRow, moveColumn);
         this.spielService.currentPlayer = originalPlayer;
 
-        // Update best move
+        // Besten Move updaten
         if (evaluation > maxEval) {
           maxEval = evaluation;
           if (depth === 0) {
@@ -94,21 +95,21 @@ export class ComputerlogikService {
       let minEval = Infinity;
 
       for (const [moveRow, moveColumn] of legalMoves) {
-        // Save current state
+        // Aktuellen Status speichern
         const originalPlayer = this.spielService.currentPlayer;
 
-        // Make move as human
+        // Move ausführen
         this.spielService.currentPlayer = this.spielService.HUMAN_PLAYER;
         this.spielService.makeMove(moveRow, moveColumn);
 
-        // Evaluate this move
+        // Move bewerten
         const evaluation = this.minimax(depth + 1, true);
 
-        // Undo move
+        // Move Rückgängig machen
         this.spielService.undoMove(moveRow, moveColumn);
         this.spielService.currentPlayer = originalPlayer;
 
-        // Update best value
+        // Besten Move updaten
         minEval = Math.min(minEval, evaluation);
       }
 
@@ -116,25 +117,27 @@ export class ComputerlogikService {
     }
   }
 
+  //Durchsucht das Spielfeld nach möglichen 4er Reihen und bewertet diese
   evaluateBoard(): number {
-    let score = 0;
-    const board = this.spielService.gameBoard;
-    const rows = board.length;
-    const cols = board[0].length;
+    let score = 0; //gesamtpunktestand für das Spielfeld
+    const board = this.spielService.gameBoard; //aktuelles Spielfeld
+    const rows = board.length; // Reihen im Spielfeld
+    const cols = board[0].length; // Spalten im Spielfeld
 
-    // Helferfunktion um Spielerwert zu erhalten
+    // Helferfunktion, um den Wert eines Spielers zu bestimmen
     const getPlayerValue = (cell: any): number => {
-      if (cell === this.spielService.COMPUTER_PLAYER) return 1; // Computer
-      if (cell === this.spielService.HUMAN_PLAYER) return -1; // Gegner
-      return 0; //leer
+      if (cell === this.spielService.COMPUTER_PLAYER) return 1; // Der Computer wird mit +1 bewertet
+      if (cell === this.spielService.HUMAN_PLAYER) return -1; // Der menschliche Spieler wird mit -1 bewertet
+      return 0; // Leere Felder = 0
     };
 
-    // Bewertung
+    // Bewertet Teilsequenzen des Spielfelds
     const evaluateWindow = (window: any[]): number => {
-      let computerCount = 0;
-      let opponentCount = 0;
+      let computerCount = 0; // felder die der computer belegt hat
+      let opponentCount = 0; // felder die der spieler belegt hat
       let emptyCount = 0;
 
+      // Zähle die Spielsteine im aktuellen Fenster
       window.forEach((cell) => {
         const value = getPlayerValue(cell);
         if (value === 1) computerCount++;
@@ -142,16 +145,17 @@ export class ComputerlogikService {
         else emptyCount++;
       });
 
-      if (computerCount === 4) return 1000;
-      if (opponentCount === 4) return -100;
-      if (computerCount === 3 && emptyCount === 1) return 5;
-      if (opponentCount === 3 && emptyCount === 1) return -5;
-      if (computerCount === 2 && emptyCount === 2) return 2;
-      if (opponentCount === 2 && emptyCount === 2) return -2;
-      return 0;
+      // Bewertung des Fensters je nach Anzahl der Spielsteine
+      if (computerCount === 4) return 1000; // Computer gewinnt
+      if (opponentCount === 4) return -100; // Spieler gewinnt
+      if (computerCount === 3 && emptyCount === 1) return 10; // gute Position für den Computer
+      if (opponentCount === 3 && emptyCount === 1) return -10; // gefährlich für den Computer
+      if (computerCount === 2 && emptyCount === 2) return 2; // leichte Chance
+      if (opponentCount === 2 && emptyCount === 2) return -2; // kleine Gefahr
+      return 0; // Keine relevante Sequenz
     };
 
-    // Horizontal
+    // horizontale bewertung
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c <= cols - 4; c++) {
         const window = board[r].slice(c, c + 4);
@@ -159,7 +163,7 @@ export class ComputerlogikService {
       }
     }
 
-    // Vertikal
+    // vertikale bewertung
     for (let c = 0; c < cols; c++) {
       for (let r = 0; r <= rows - 4; r++) {
         const window = [
@@ -172,7 +176,7 @@ export class ComputerlogikService {
       }
     }
 
-    // Diagonal links oben nach rechts unten
+    // Diagonal links nach rechts
     for (let r = 0; r <= rows - 4; r++) {
       for (let c = 0; c <= cols - 4; c++) {
         const window = [
@@ -185,7 +189,7 @@ export class ComputerlogikService {
       }
     }
 
-    // Diagonal rechts oben nach links unten
+    // diagonal rechts nach links
     for (let r = 0; r <= rows - 4; r++) {
       for (let c = 3; c < cols; c++) {
         const window = [
@@ -198,6 +202,6 @@ export class ComputerlogikService {
       }
     }
 
-    return score;
+    return score; //Gesamtbewertung ausgeben
   }
 }
